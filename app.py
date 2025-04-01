@@ -16,32 +16,48 @@ def show_login():
         submitted = st.form_submit_button("Войти")
 
         if submitted:
-            result = authenticate_user(username, password)
-            if result:
-                uname, role = result
-                rights = get_access_rights_by_role(role)
+            with st.spinner("⏳ Делаем запрос ..."):
+                result = authenticate_user(username, password)
+                if result:
+                    uname, role = result
+                    rights = get_access_rights_by_role(role)
 
-                st.session_state.username = uname
-                st.session_state.role = role
-                st.session_state.access_rights = rights
-                st.session_state.current_state = "main"
-                st.rerun()
-            else:
-                st.error("Неверный логин или пароль")
+                    st.session_state.username = uname
+                    st.session_state.role = role
+                    st.session_state.access_rights = rights
+                    st.session_state.current_state = "welcome"
+                    st.rerun()
+                else:
+                    st.error("Неверный логин или пароль")
 
-def show_main():
-    st.title("📦 SRM-система")
-    st.success(f"Привет, {st.session_state.username}! Твоя роль — {st.session_state.role}")
-    st.write("### 🧾 Твои доступы:")
+def show_sidebar():
+    st.sidebar.markdown(f"👤 Вы вошли под логином: **{st.session_state.username}**")
+    st.sidebar.markdown(f"🔑 Ваша роль: **{st.session_state.role}**")
 
-    if st.session_state.access_rights:
-        for name, description in st.session_state.access_rights:
-            st.markdown(f"- **{name}** — {description}")
-    else:
-        st.info("Нет доступов для твоей роли.")
+    pages = {name: description for name, description in st.session_state.access_rights}
+    selection = st.sidebar.radio(
+        "📂 Разделы",
+        ["welcome"] + list(pages.keys()),
+        format_func=lambda x: "Главная" if x == "welcome" else x
+    )
+    st.session_state.current_state = selection
 
-    if st.button("🚪 Выйти"):
+    st.sidebar.markdown("---")
+    if st.sidebar.button("🚪 Выйти"):
         logout()
+
+def show_welcome():
+    st.title("👋 Добрый день!")
+    st.markdown(f"""
+    Вы вошли под ролью **{st.session_state.role}**.
+
+    👉 В меню слева выберите действие, которое хотите выполнить.
+    """)
+
+def show_dynamic_page():
+    st.title(f"📄 Раздел: {st.session_state.current_state}")
+    st.write("Здесь будет функциональность, связанная с этим доступом.")
+    # Здесь можно добавить обработку конкретного раздела по имени
 
 def main():
     st.set_page_config(page_title="SRM-система", page_icon="📦")
@@ -54,8 +70,12 @@ def main():
 
     if st.session_state.current_state == "login":
         show_login()
-    elif st.session_state.current_state == "main":
-        show_main()
+    else:
+        show_sidebar()
+        if st.session_state.current_state == "welcome":
+            show_welcome()
+        else:
+            show_dynamic_page()
 
 if __name__ == "__main__":
     main()
