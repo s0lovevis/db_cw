@@ -3,9 +3,9 @@ from connect import get_connection
 
 def get_access_rights_by_role(role_name: str) -> List[Tuple[str, str]]:
     query = """
-        SELECT a.name, a.description
-        FROM access_rights a
-        JOIN roles r ON a.role_id = r.id
+        SELECT ar.name, ar.description
+        FROM access_rights ar
+        JOIN roles r ON ar.role_id = r.role_id
         WHERE r.name = %s
     """
     with get_connection() as conn:

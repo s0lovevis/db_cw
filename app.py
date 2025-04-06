@@ -16,14 +16,15 @@ def show_login():
         submitted = st.form_submit_button("Войти")
 
         if submitted:
-            with st.spinner("⏳ Делаем запрос ..."):
+            with st.spinner("⏳ Поиск пользователя ..."):
                 result = authenticate_user(username, password)
                 if result:
-                    uname, role = result
+                    uname, role, role_desc = result
                     rights = get_access_rights_by_role(role)
 
                     st.session_state.username = uname
                     st.session_state.role = role
+                    st.session_state.role_desc = role_desc
                     st.session_state.access_rights = rights
                     st.session_state.current_state = "welcome"
                     st.rerun()
@@ -32,7 +33,8 @@ def show_login():
 
 def show_sidebar():
     st.sidebar.markdown(f"👤 Вы вошли под логином: **{st.session_state.username}**")
-    st.sidebar.markdown(f"🔑 Ваша роль: **{st.session_state.role}**")
+    st.sidebar.markdown(f"🔑 Ваша роль: **{st.session_state.role_desc}**")
+    st.sidebar.markdown("---")
 
     pages = {name: description for name, description in st.session_state.access_rights}
     selection = st.sidebar.radio(
@@ -47,11 +49,9 @@ def show_sidebar():
         logout()
 
 def show_welcome():
-    st.title("👋 Добрый день!")
+    st.title("Добрый день!")
     st.markdown(f"""
-    Вы вошли под ролью **{st.session_state.role}**.
-
-    👉 В меню слева выберите действие, которое хотите выполнить.
+    В меню слева выберите действие, которое хотите выполнить.
     """)
 
 def show_dynamic_page():
