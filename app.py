@@ -1,6 +1,11 @@
 import streamlit as st
 from services.auth_service import authenticate_user
 from services.access_service import get_access_rights_by_role
+from services.add_new_user import render_add_user_form
+from services.change_password import render_change_password
+from services.delete_user import render_delete_user
+from services.view_users import render_view_users
+
 
 def logout():
     for key in list(st.session_state.keys()):
@@ -36,12 +41,15 @@ def show_sidebar():
     st.sidebar.markdown(f"🔑 Ваша роль: **{st.session_state.role_desc}**")
     st.sidebar.markdown("---")
 
-    pages = {name: description for name, description in st.session_state.access_rights}
-    selection = st.sidebar.radio(
+    pages = {description: name for name, description in st.session_state.access_rights}
+
+    selection_description = st.sidebar.radio(
         "📂 Разделы",
-        ["welcome"] + list(pages.keys()),
-        format_func=lambda x: "Главная" if x == "welcome" else x
+        ["Главная"] + list(pages.keys())
     )
+
+    # Преобразуем обратно в name
+    selection = "welcome" if selection_description == "Главная" else pages[selection_description]
     st.session_state.current_state = selection
 
     st.sidebar.markdown("---")
@@ -55,9 +63,20 @@ def show_welcome():
     """)
 
 def show_dynamic_page():
-    st.title(f"📄 Раздел: {st.session_state.current_state}")
-    st.write("Здесь будет функциональность, связанная с этим доступом.")
-    # Здесь можно добавить обработку конкретного раздела по имени
+    current = st.session_state.current_state
+    if current == "add_new_user":
+        render_add_user_form()
+    elif current == "change_password":
+        render_change_password()
+    elif current == "delete_user":
+        render_delete_user()
+    elif current == "view_users":
+        render_view_users()
+    else:
+        st.title(f"📄 Раздел: {current}")
+        st.write("Здесь будет функциональность, связанная с этим доступом.")
+
+
 
 def main():
     st.set_page_config(page_title="SRM-система", page_icon="📦")

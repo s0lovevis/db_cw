@@ -58,18 +58,70 @@ def initialize_database():
     INSERT INTO users (username, password_hash, role_id)
     SELECT 'manager', crypt('manager', gen_salt('bf')), (SELECT role_id FROM roles WHERE name = 'manager')
     WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'manager');
+
+    
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'admin'), 
+        'add_new_user', 
+        'Добавление нового пользователя в систему'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'add_new_user' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'admin')
+    );
+
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'admin'), 
+        'change_password', 
+        'Смена пароля'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'change_password' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'admin')
+    );
+
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'manager'), 
+        'change_password', 
+        'Смена пароля'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'change_password' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'manager')
+    );
+
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'admin'), 
+        'delete_user', 
+        'Удаление пользователя'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'delete_user' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'admin')
+    );
+
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'admin'), 
+        'view_users', 
+        'Просмотр списка сотрудников'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'view_users' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'admin')
+    );
     """
 
     conn = None
     try:
-        # Получаем соединение с БД
         conn = get_connection()
         cursor = conn.cursor()
         
-        # Выполняем SQL-скрипт
         cursor.execute(sql_script)
-        
-        # Фиксируем изменения
         conn.commit()
         
         print("База данных успешно инициализирована!")
