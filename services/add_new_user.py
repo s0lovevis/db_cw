@@ -6,7 +6,7 @@ def render_add_user_form():
 
     username = st.text_input("Введите логин")
     password = st.text_input("Введите пароль", type="password")
-    role = st.selectbox("Выберите роль", ["admin", "manager"])
+    role = st.selectbox("Выберите роль", ["admin", "manager", "warehouse_worker"])
 
     if st.button("Добавить пользователя"):
         if not username or not password:

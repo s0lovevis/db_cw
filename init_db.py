@@ -81,6 +81,10 @@ def initialize_database():
     SELECT 'manager', 'Менеджер по работе с поставщиками'
     WHERE NOT EXISTS (SELECT 1 FROM roles WHERE name = 'manager');
 
+    INSERT INTO roles (name, description)
+    SELECT 'warehouse_worker', 'Сотрудник склада'
+    WHERE NOT EXISTS (SELECT 1 FROM roles WHERE name = 'warehouse_worker');
+
     INSERT INTO users (username, password_hash, role_id)
     SELECT 'admin', crypt('admin', gen_salt('bf')), (SELECT role_id FROM roles WHERE name = 'admin')
     WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
@@ -88,6 +92,10 @@ def initialize_database():
     INSERT INTO users (username, password_hash, role_id)
     SELECT 'manager', crypt('manager', gen_salt('bf')), (SELECT role_id FROM roles WHERE name = 'manager')
     WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'manager');
+
+    INSERT INTO users (username, password_hash, role_id)
+    SELECT 'worker', crypt('worker', gen_salt('bf')), (SELECT role_id FROM roles WHERE name = 'warehouse_worker')
+    WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'worker');
 
     
     INSERT INTO access_rights (role_id, name, description)
@@ -121,6 +129,17 @@ def initialize_database():
         SELECT 1 FROM access_rights 
         WHERE name = 'change_password' 
         AND role_id = (SELECT role_id FROM roles WHERE name = 'manager')
+    );
+
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 
+        'change_password', 
+        'Смена пароля'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'change_password' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'warehouse_worker')
     );
 
     INSERT INTO access_rights (role_id, name, description)
