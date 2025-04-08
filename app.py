@@ -5,6 +5,9 @@ from services.add_new_user import render_add_user_form
 from services.change_password import render_change_password
 from services.delete_user import render_delete_user
 from services.view_users import render_view_users
+from services.manage_addresses import render_manage_addresses
+from services.manage_decision_makers import render_manage_decision_makers
+from services.manage_suppliers import render_manage_suppliers
 
 
 def logout():
@@ -72,6 +75,12 @@ def show_dynamic_page():
         render_delete_user()
     elif current == "view_users":
         render_view_users()
+    elif current == "manage_addresses":
+        render_manage_addresses()
+    elif current == "manage_decision_makers":
+        render_manage_decision_makers()
+    elif current == "manage_suppliers":
+        render_manage_suppliers()
     else:
         st.title(f"📄 Раздел: {current}")
         st.write("Здесь будет функциональность, связанная с этим доступом.")

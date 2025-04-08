@@ -43,6 +43,36 @@ def initialize_database():
         FOREIGN KEY (role_id) REFERENCES roles(role_id)
     );
 
+-- Создание таблицы юридических адресов
+    CREATE TABLE IF NOT EXISTS legal_addresses (
+        address_id SERIAL PRIMARY KEY,
+        city VARCHAR(100) NOT NULL,
+        street VARCHAR(100) NOT NULL,
+        house VARCHAR(10) NOT NULL,
+        building VARCHAR(10)
+    );
+
+    -- Создание таблицы ЛПР (лиц, принимающих решения)
+    CREATE TABLE IF NOT EXISTS decision_makers (
+        dm_id SERIAL PRIMARY KEY,
+        last_name VARCHAR(50) NOT NULL,
+        first_name VARCHAR(50) NOT NULL,
+        middle_name VARCHAR(50),
+        age INT CHECK (age > 0)
+    );
+
+    -- Создание таблицы поставщиков
+    CREATE TABLE IF NOT EXISTS suppliers (
+        supplier_id SERIAL PRIMARY KEY,
+        company_name VARCHAR(100) NOT NULL,
+        inn VARCHAR(12) NOT NULL UNIQUE,
+        ogrn VARCHAR(13) NOT NULL UNIQUE,
+        address_id INT NOT NULL,
+        dm_id INT NOT NULL,
+        FOREIGN KEY (address_id) REFERENCES legal_addresses(address_id),
+        FOREIGN KEY (dm_id) REFERENCES decision_makers(dm_id)
+    );
+
     INSERT INTO roles (name, description)
     SELECT 'admin', 'Администратор CRM-системы'
     WHERE NOT EXISTS (SELECT 1 FROM roles WHERE name = 'admin');
@@ -113,6 +143,42 @@ def initialize_database():
         SELECT 1 FROM access_rights 
         WHERE name = 'view_users' 
         AND role_id = (SELECT role_id FROM roles WHERE name = 'admin')
+    );
+
+-- Добавление прав для управления адресами
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'manager'), 
+        'manage_addresses', 
+        'Управление адресами поставщиков'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'manage_addresses' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'manager')
+    );
+
+    -- Добавление прав для управления ЛПР
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'manager'), 
+        'manage_decision_makers', 
+        'Управление базой ЛПРов'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'manage_decision_makers' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'manager')
+    );
+
+    -- Добавление прав для управления поставщиками
+    INSERT INTO access_rights (role_id, name, description)
+    SELECT 
+        (SELECT role_id FROM roles WHERE name = 'manager'), 
+        'manage_suppliers', 
+        'Управление базой поставщиков'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM access_rights 
+        WHERE name = 'manage_suppliers' 
+        AND role_id = (SELECT role_id FROM roles WHERE name = 'manager')
     );
     """
 
