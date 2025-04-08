@@ -81,6 +81,17 @@ def show_dynamic_page():
 def main():
     st.set_page_config(page_title="SRM-система", page_icon="📦")
 
+    st.markdown("""
+        <style>
+        /* Фиксированная ширина сайдбара */
+        section[data-testid="stSidebar"] {
+            width: 400px !important;
+            min-width: 400px !important;
+            max-width: 400px !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     if "current_state" not in st.session_state:
         st.session_state.current_state = "login"
         st.session_state.username = ""
