@@ -53,9 +53,9 @@ def render_manage_decision_makers():
     def view_decision_makers():
         with get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute("SELECT dm_id, last_name, first_name, middle_name, age FROM decision_makers")
+                cur.execute("SELECT last_name, first_name, middle_name, age FROM decision_makers")
                 rows = cur.fetchall()
-        df = pd.DataFrame(rows, columns=["ID ЛПР", "Фамилия", "Имя", "Отчество", "Возраст"])
+        df = pd.DataFrame(rows, columns=["Фамилия", "Имя", "Отчество", "Возраст"])
         st.dataframe(df, use_container_width=True)
 
     # UI для управления ЛПР
@@ -73,7 +73,19 @@ def render_manage_decision_makers():
             add_dm(last_name, first_name, middle_name, age)
 
     elif action == "Изменить ЛПР":
-        dm_id = st.number_input("ID ЛПР", min_value=1)
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT dm_id, last_name, first_name, middle_name, age FROM decision_makers")
+                dms = cur.fetchall()
+
+        if not dms:
+            st.info("Нет доступных ЛПР для изменения.")
+            return
+
+        dm_map = {f"{d[1]} {d[2]} {d[3]}, {d[4]} лет": d[0] for d in dms}
+        selected = st.selectbox("Выберите ЛПР", list(dm_map.keys()))
+        dm_id = dm_map[selected]
+
         last_name = st.text_input("Новая фамилия")
         first_name = st.text_input("Новое имя")
         middle_name = st.text_input("Новое отчество")
@@ -81,7 +93,20 @@ def render_manage_decision_makers():
         if st.button("Изменить"):
             update_dm(dm_id, last_name, first_name, middle_name, age)
 
+
     elif action == "Удалить ЛПР":
-        dm_id = st.number_input("ID ЛПР", min_value=1)
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT dm_id, last_name, first_name, middle_name, age FROM decision_makers")
+                dms = cur.fetchall()
+
+        if not dms:
+            st.info("Нет доступных ЛПР для удаления.")
+            return
+
+        dm_map = {f"{d[1]} {d[2]} {d[3]}, {d[4]} лет": d[0] for d in dms}
+        selected = st.selectbox("Выберите ЛПР для удаления", list(dm_map.keys()))
+        dm_id = dm_map[selected]
+
         if st.button("Удалить"):
             delete_dm(dm_id)

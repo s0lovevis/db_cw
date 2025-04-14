@@ -92,7 +92,7 @@ def render_manage_suppliers():
             with conn.cursor() as cur:
                 cur.execute("""
                     SELECT 
-                        s.supplier_id, s.company_name, s.inn, s.ogrn,
+                        s.company_name, s.inn,
                         la.city, la.street, la.house, la.building,
                         dm.last_name, dm.first_name, dm.middle_name, dm.age
                     FROM suppliers s
@@ -101,7 +101,7 @@ def render_manage_suppliers():
                 """)
                 rows = cur.fetchall()
         df = pd.DataFrame(rows, columns=[
-            "ID поставщика", "Название компании", "ИНН", "ОГРН",
+            "Название компании", "ИНН",
             "Город", "Улица", "Дом", "Строение",
             "Фамилия ЛПР", "Имя ЛПР", "Отчество ЛПР", "Возраст ЛПР"
         ])
@@ -117,22 +117,88 @@ def render_manage_suppliers():
         company_name = st.text_input("Название компании")
         inn = st.text_input("ИНН")
         ogrn = st.text_input("ОГРН")
-        address_id = st.number_input("ID адреса", min_value=1)
-        dm_id = st.number_input("ID ЛПР", min_value=1)
+
+        # Загружаем адреса
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT address_id, city, street, house, building FROM legal_addresses")
+                addresses = cur.fetchall()
+                cur.execute("SELECT dm_id, last_name, first_name, middle_name FROM decision_makers")
+                dms = cur.fetchall()
+
+        if not addresses:
+            st.info("Сначала добавьте хотя бы один адрес.")
+            return
+        if not dms:
+            st.info("Сначала добавьте хотя бы одного ЛПР.")
+            return
+
+        address_map = {f"{a[1]}, {a[2]}, {a[3]}, {a[4]}": a[0] for a in addresses}
+        address_choice = st.selectbox("Выберите адрес", list(address_map.keys()))
+        address_id = address_map[address_choice]
+
+        dm_map = {f"{d[1]} {d[2]} {d[3]}": d[0] for d in dms}
+        dm_choice = st.selectbox("Выберите ЛПР", list(dm_map.keys()))
+        dm_id = dm_map[dm_choice]
+
         if st.button("Добавить"):
             add_supplier(company_name, inn, ogrn, address_id, dm_id)
 
+
     elif action == "Изменить поставщика":
-        supplier_id = st.number_input("ID поставщика", min_value=1)
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT supplier_id, company_name, inn FROM suppliers")
+                suppliers = cur.fetchall()
+                cur.execute("SELECT address_id, city, street, house, building FROM legal_addresses")
+                addresses = cur.fetchall()
+                cur.execute("SELECT dm_id, last_name, first_name, middle_name FROM decision_makers")
+                dms = cur.fetchall()
+
+        if not suppliers:
+            st.info("Нет поставщиков для изменения.")
+            return
+        if not addresses:
+            st.info("Сначала добавьте хотя бы один адрес.")
+            return
+        if not dms:
+            st.info("Сначала добавьте хотя бы одного ЛПР.")
+            return
+
+        supplier_map = {f"{s[1]} (ИНН: {s[2]})": s[0] for s in suppliers}
+        supplier_choice = st.selectbox("Выберите поставщика", list(supplier_map.keys()))
+        supplier_id = supplier_map[supplier_choice]
+
         company_name = st.text_input("Новое название компании")
         inn = st.text_input("Новый ИНН")
         ogrn = st.text_input("Новый ОГРН")
-        address_id = st.number_input("Новый ID адреса", min_value=1)
-        dm_id = st.number_input("Новый ID ЛПР", min_value=1)
+
+        address_map = {f"{a[1]}, {a[2]}, {a[3]}, {a[4]}": a[0] for a in addresses}
+        address_choice = st.selectbox("Выберите новый адрес", list(address_map.keys()))
+        address_id = address_map[address_choice]
+
+        dm_map = {f"{d[1]} {d[2]} {d[3]}": d[0] for d in dms}
+        dm_choice = st.selectbox("Выберите нового ЛПР", list(dm_map.keys()))
+        dm_id = dm_map[dm_choice]
+
         if st.button("Изменить"):
             update_supplier(supplier_id, company_name, inn, ogrn, address_id, dm_id)
 
+
+
     elif action == "Удалить поставщика":
-        supplier_id = st.number_input("ID поставщика", min_value=1)
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT supplier_id, company_name, inn FROM suppliers")
+                suppliers = cur.fetchall()
+
+        if not suppliers:
+            st.info("Нет поставщиков для удаления.")
+            return
+
+        supplier_map = {f"{s[1]} (ИНН: {s[2]})": s[0] for s in suppliers}
+        selected = st.selectbox("Выберите поставщика для удаления", list(supplier_map.keys()))
+        supplier_id = supplier_map[selected]
+
         if st.button("Удалить"):
             delete_supplier(supplier_id)

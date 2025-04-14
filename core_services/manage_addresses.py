@@ -73,7 +73,19 @@ def render_manage_addresses():
             add_address(city, street, house, building)
 
     elif action == "Изменить адрес":
-        address_id = st.number_input("ID адреса", min_value=1)
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT address_id, city, street, house, building FROM legal_addresses")
+                addresses = cur.fetchall()
+
+        if not addresses:
+            st.info("Нет доступных адресов для изменения.")
+            return
+
+        address_map = {f"{a[1]}, {a[2]}, {a[3]}, {a[4]}": a[0] for a in addresses}
+        selected = st.selectbox("Выберите адрес", list(address_map.keys()))
+        address_id = address_map[selected]
+
         city = st.text_input("Новый город")
         street = st.text_input("Новая улица")
         house = st.text_input("Новый дом")
@@ -81,7 +93,20 @@ def render_manage_addresses():
         if st.button("Изменить"):
             update_address(address_id, city, street, house, building)
 
+
     elif action == "Удалить адрес":
-        address_id = st.number_input("ID адреса", min_value=1)
+        with get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT address_id, city, street, house, building FROM legal_addresses")
+                addresses = cur.fetchall()
+
+        if not addresses:
+            st.info("Нет доступных адресов для удаления.")
+            return
+
+        address_map = {f"{a[1]}, {a[2]}, {a[3]}, {a[4]}": a[0] for a in addresses}
+        selected = st.selectbox("Выберите адрес для удаления", list(address_map.keys()))
+        address_id = address_map[selected]
+
         if st.button("Удалить"):
             delete_address(address_id)
