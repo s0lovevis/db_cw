@@ -1,13 +1,13 @@
 import streamlit as st
-from services.auth_service import authenticate_user
-from services.access_service import get_access_rights_by_role
-from services.add_new_user import render_add_user_form
-from services.change_password import render_change_password
-from services.delete_user import render_delete_user
-from services.view_users import render_view_users
-from services.manage_addresses import render_manage_addresses
-from services.manage_decision_makers import render_manage_decision_makers
-from services.manage_suppliers import render_manage_suppliers
+from user_services.auth_service import authenticate_user
+from user_services.access_service import get_access_rights_by_role
+from user_services.add_new_user import render_add_user_form
+from user_services.change_password import render_change_password
+from user_services.delete_user import render_delete_user
+from user_services.view_users import render_view_users
+from core_services.manage_addresses import render_manage_addresses
+from core_services.manage_decision_makers import render_manage_decision_makers
+from core_services.manage_suppliers import render_manage_suppliers
 
 
 def logout():
