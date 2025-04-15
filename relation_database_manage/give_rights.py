@@ -41,7 +41,11 @@ def initialize_database():
 
         ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_addresses', 'Управление адресами поставщиков'),
         ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_decision_makers', 'Управление базой ЛПРов'),
-        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_suppliers', 'Управление базой поставщиков');
+        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_suppliers', 'Управление базой поставщиков'),
+
+        -- Каталог (warehouse_worker)
+        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'manage_catalog', 'Управление каталогом товаров');
+
     """
 
     conn = None

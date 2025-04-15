@@ -8,6 +8,7 @@ from user_services.view_users import render_view_users
 from core_services.manage_addresses import render_manage_addresses
 from core_services.manage_decision_makers import render_manage_decision_makers
 from core_services.manage_suppliers import render_manage_suppliers
+from core_services.manage_catalog import render_manage_catalog
 
 
 def logout():
@@ -81,6 +82,8 @@ def show_dynamic_page():
         render_manage_decision_makers()
     elif current == "manage_suppliers":
         render_manage_suppliers()
+    elif current == "manage_catalog":
+        render_manage_catalog()
     else:
         st.title(f"📄 Раздел: {current}")
         st.write("Здесь будет функциональность, связанная с этим доступом.")
@@ -88,7 +91,7 @@ def show_dynamic_page():
 
 
 def main():
-    st.set_page_config(page_title="SRM-система", page_icon="📦")
+    st.set_page_config(page_title="SRM-система мебельного магазина", page_icon="📦")
 
     st.markdown("""
         <style>

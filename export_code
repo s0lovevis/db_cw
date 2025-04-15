@@ -1,0 +1,18 @@
+# Проверка: есть ли хотя бы один аргумент
+if [ "$#" -eq 0 ]; then
+  echo "Использование: $0 файл1.py файл2.py ..."
+  exit 1
+fi
+
+# Очищаем предыдущий вывод
+> all_code.txt
+
+# Проходим по всем переданным аргументам
+for file in "$@"; do
+  if [ -f "$file" ]; then
+    echo -e "\n$file:\n" >> all_code.txt
+    cat "$file" >> all_code.txt
+  else
+    echo "Файл '$file' не найден, пропущен." >&2
+  fi
+done

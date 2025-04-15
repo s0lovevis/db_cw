@@ -1,4 +1,0 @@
-git ls-files '*.py' | sort | while read file; do
-  echo -e "\n$file:\n" >> all_code.txt
-  cat "$file" >> all_code.txt
-done

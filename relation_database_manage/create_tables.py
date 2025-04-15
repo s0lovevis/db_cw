@@ -72,6 +72,19 @@ def initialize_database():
         FOREIGN KEY (dm_id) REFERENCES decision_makers(dm_id)
     );
 
+    CREATE TABLE IF NOT EXISTS catalog (
+        item_id SERIAL PRIMARY KEY,
+        supplier_id INT NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        length NUMERIC,
+        width NUMERIC,
+        height NUMERIC,
+        price NUMERIC,
+        FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
+    );
+
+
     """
 
     conn = None
@@ -92,5 +105,49 @@ def initialize_database():
         if conn:
             conn.close()
 
+def fill_initial_data():
+    sql_script = """
+    -- Адреса
+    INSERT INTO legal_addresses (city, street, house, building) VALUES
+    ('Москва', 'Ленинская', '10', '1'),
+    ('Санкт-Петербург', 'Невский проспект', '25', NULL),
+    ('Казань', 'Баумана', '3', 'А');
+
+    -- ЛПРы
+    INSERT INTO decision_makers (last_name, first_name, middle_name, age) VALUES
+    ('Иванов', 'Иван', 'Иванович', 45),
+    ('Петров', 'Петр', 'Петрович', 38),
+    ('Сидоров', 'Сидор', NULL, 50);
+
+    -- Поставщики (привязка к адресам и ЛПРам)
+    INSERT INTO suppliers (company_name, inn, ogrn, address_id, dm_id) VALUES
+    ('ООО Альфа', '7701234567', '1027700000001', 1, 1),
+    ('ООО Бета', '7809876543', '1027800000002', 2, 2),
+    ('ООО Гамма', '1654321987', '1021600000003', 3, 3);
+
+    -- Каталог товаров (привязка к поставщикам)
+    INSERT INTO catalog (supplier_id, name, description, length, width, height, price) VALUES
+    (1, 'Ящик алюминиевый', 'Прочный ящик для хранения', 40, 30, 20, 1500),
+    (1, 'Палета деревянная', 'Палета 120x80 стандарт', 120, 80, 15, 800),
+    (2, 'Контейнер пластиковый', 'Герметичный пластиковый контейнер', 60, 40, 35, 1200),
+    (3, 'Короб архивный', 'Картонная коробка для документов', 35, 25, 10, 300);
+    """
+
+    conn = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(sql_script)
+        conn.commit()
+        print("Начальные данные успешно добавлены.")
+    except Exception as e:
+        print(f"Ошибка при добавлении данных: {e}")
+        if conn:
+            conn.rollback()
+    finally:
+        if conn:
+            conn.close()
+
 if __name__ == "__main__":
     initialize_database()
+    fill_initial_data()
