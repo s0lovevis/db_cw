@@ -1,4 +1,5 @@
 import streamlit as st
+import psycopg2
 from connect import get_connection
 import pandas as pd
 
@@ -38,16 +39,23 @@ def render_manage_addresses():
                 st.success("Адрес обновлен.")
 
     # Функция удаления адреса
-    def delete_address(address_id):
+
+    def delete_address(address_id: int) -> None:
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT 1 FROM legal_addresses WHERE address_id = %s", (address_id,))
                 if not cur.fetchone():
                     st.error("Адрес с таким ID не найден.")
                     return
-                cur.execute("DELETE FROM legal_addresses WHERE address_id = %s", (address_id,))
-                conn.commit()
-                st.success("Адрес удален.")
+                try:
+                    cur.execute("DELETE FROM legal_addresses WHERE address_id = %s", (address_id,))
+                    conn.commit()
+                    st.success("Адрес удален.")
+                except psycopg2.errors.ForeignKeyViolation:
+                    conn.rollback()
+                    st.error("Невозможно удалить адрес, закрепленный за поставщиком. "
+                            "Рекомендуем просто поменять существующий адрес поставщика вместо его пересоздания.")
+
 
     # Функция выгрузки всех адресов
     def view_addresses():

@@ -22,7 +22,7 @@ def logout():
     st.rerun()
 
 def show_login():
-    st.title("🔐 SRM-система — Вход")
+    st.title("🔐 SRM-система мебельного магазина")
     with st.form("login_form"):
         username = st.text_input("Логин")
         password = st.text_input("Пароль", type="password")

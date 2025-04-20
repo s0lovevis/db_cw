@@ -1,4 +1,5 @@
 import streamlit as st
+import psycopg2
 from connect import get_connection
 import pandas as pd
 
@@ -38,16 +39,22 @@ def render_manage_decision_makers():
                 st.success("ЛПР обновлен.")
 
     # Функция удаления ЛПР
-    def delete_dm(dm_id):
+    def delete_dm(dm_id: int) -> None:
         with get_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT 1 FROM decision_makers WHERE dm_id = %s", (dm_id,))
                 if not cur.fetchone():
                     st.error("ЛПР с таким ID не найден.")
                     return
-                cur.execute("DELETE FROM decision_makers WHERE dm_id = %s", (dm_id,))
-                conn.commit()
-                st.success("ЛПР удален.")
+                try:
+                    cur.execute("DELETE FROM decision_makers WHERE dm_id = %s", (dm_id,))
+                    conn.commit()
+                    st.success("ЛПР удалён.")
+                except psycopg2.errors.ForeignKeyViolation:
+                    conn.rollback()
+                    st.error("Невозможно удалить ЛПР, закреплённого за поставщиком. "
+                            "Рекомендуем сначала изменить ЛПРа у поставщика или удалить самого поставщика.")
+
 
     # Функция выгрузки всех ЛПР
     def view_decision_makers():
