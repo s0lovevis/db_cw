@@ -30,26 +30,29 @@ def initialize_database():
         ('worker', crypt('worker', gen_salt('bf')), (SELECT role_id FROM roles WHERE name = 'warehouse_worker'));
 
     -- Права доступа
-    INSERT INTO access_rights (role_id, name, description) VALUES 
-        ((SELECT role_id FROM roles WHERE name = 'admin'), 'add_new_user', 'Добавление нового пользователя в систему'),
-        ((SELECT role_id FROM roles WHERE name = 'admin'), 'delete_user', 'Удаление пользователя'),
-        ((SELECT role_id FROM roles WHERE name = 'admin'), 'view_users', 'Просмотр списка сотрудников'),
+    INSERT INTO access_rights (role_id, name, description) VALUES
+        -- Для админа
+        ((SELECT role_id FROM roles WHERE name = 'admin'), 'manage_tasks', '📋Задания'),
+        ((SELECT role_id FROM roles WHERE name = 'admin'), 'add_new_user', '🧑‍💼Добавление нового пользователя'),
+        ((SELECT role_id FROM roles WHERE name = 'admin'), 'delete_user', '🗑️Удаление пользователя'),
+        ((SELECT role_id FROM roles WHERE name = 'admin'), 'view_users', '👥Просмотр списка сотрудников'),
+        ((SELECT role_id FROM roles WHERE name = 'admin'), 'view_suppliers', '💼Просмотр базы поставщиков'),
+        ((SELECT role_id FROM roles WHERE name = 'admin'), 'view_warehouse', '🏭Просмотр содержимого склада'),
+        ((SELECT role_id FROM roles WHERE name = 'admin'), 'change_password', '🔐Смена пароля'),
 
-        ((SELECT role_id FROM roles WHERE name = 'admin'), 'change_password', 'Смена пароля'),
-        ((SELECT role_id FROM roles WHERE name = 'manager'), 'change_password', 'Смена пароля'),
-        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'change_password', 'Смена пароля'),
+        -- Для менеджера
+        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_tasks', '📋Задания'),
+        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_addresses', '🏢Управление адресами поставщиков'),
+        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_decision_makers', '👤Управление базой ЛПРов'),
+        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_suppliers', '💼Управление базой поставщиков'),
+        ((SELECT role_id FROM roles WHERE name = 'manager'), 'change_password', '🔐Смена пароля'),
 
-        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_addresses', 'Управление адресами поставщиков'),
-        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_decision_makers', 'Управление базой ЛПРов'),
-        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_suppliers', 'Управление базой поставщиков'),
-
-        -- Каталог (warehouse_worker)
-        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'manage_warehouse', 'Управление складом'),
-        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'manage_catalog', 'Управление каталогом товаров'),
-        -- Права для работы с заданиями
-        ((SELECT role_id FROM roles WHERE name = 'admin'), 'manage_tasks', 'Управление заданиями'),
-        ((SELECT role_id FROM roles WHERE name = 'manager'), 'manage_tasks', 'Управление заданиями'),
-        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'manage_tasks', 'Управление заданиями');
+        -- Для складовщика
+        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'manage_tasks', '📋Задания'),
+        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'view_warehouse', '🏭Просмотр содержимого склада'),
+        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'manage_warehouse', '💰Провести операцию с товаром'),
+        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'manage_catalog', '📒Управление каталогом товаров'),
+        ((SELECT role_id FROM roles WHERE name = 'warehouse_worker'), 'change_password', '🔐Смена пароля');
 
     """
 

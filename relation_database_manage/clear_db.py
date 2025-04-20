@@ -18,6 +18,8 @@ def get_connection():
 def drop_all_relational_db():
 
     sql_script = """
+        drop table if exists tasks;
+        drop table if exists task_types;
         drop table if exists warehouse;
         drop table if exists transactions;
         drop table if exists catalog;

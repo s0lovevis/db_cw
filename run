@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Запуск первого скрипта
+python3 relation_database_manage/clear_db.py
+
+# Проверка на успешное выполнение первого скрипта
+if [ $? -eq 0 ]; then
+    # Запуск второго скрипта
+    python3 relation_database_manage/create_tables.py
+
+    # Проверка на успешное выполнение второго скрипта
+    if [ $? -eq 0 ]; then
+        # Запуск третьего скрипта
+        python3 relation_database_manage/give_rights.py
+    else
+        echo "Ошибка при выполнении create_tables.py"
+        exit 1
+    fi
+else
+    echo "Ошибка при выполнении clear_db.py"
+    exit 1
+fi

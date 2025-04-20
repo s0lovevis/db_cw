@@ -172,9 +172,20 @@ def fill_initial_data():
     (2, 'Контейнер пластиковый', 'Герметичный пластиковый контейнер', 60, 40, 35, 1200),
     (3, 'Короб архивный', 'Картонная коробка для документов', 35, 25, 10, 300);
 
+    -- Инициализация склада (только те товары, что из каталога)
+    INSERT INTO warehouse (item_id, quantity) VALUES
+        ((SELECT item_id FROM catalog WHERE name = 'Ящик алюминиевый'), 10),
+        ((SELECT item_id FROM catalog WHERE name = 'Палета деревянная'), 5);
+
     -- Добавление начального типа задания
     INSERT INTO task_types (name_en, name_ru, description)
-    VALUES ('update_catalog', 'Актуализировать каталог', 'Проверка и обновление информации в каталоге товаров')
+    VALUES
+        ('catalog_task', 'Работа с каталогом', 'adfsdf'),
+        ('dm_task', 'Работа с базой ЛПРов', 'adfsdf'),
+        ('address_task', 'Работа с адресами поставщиков', 'adfsdf'),
+        ('supplier_task', 'Работа с данными поставщиков', 'adfsdf'),
+        ('warehouse_task', 'Работа со складским учетом', 'adfsdf'),
+        ('buy_task', 'Работа с заказом товара', 'adfsdf')
     ON CONFLICT (name_en) DO NOTHING;
     """
 
