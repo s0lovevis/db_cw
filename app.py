@@ -10,6 +10,7 @@ from core_services.manage_decision_makers import render_manage_decision_makers
 from core_services.manage_suppliers import render_manage_suppliers
 from core_services.manage_catalog import render_manage_catalog
 from core_services.manage_warehouse import render_manage_warehouse
+from core_services.manage_tasks import render_manage_tasks
 
 
 def logout():
@@ -87,6 +88,8 @@ def show_dynamic_page():
         render_manage_catalog()
     elif current == "manage_warehouse":
         render_manage_warehouse()
+    elif current == "manage_tasks":
+        render_manage_tasks()
     else:
         st.title(f"📄 Раздел: {current}")
         st.write("Здесь будет функциональность, связанная с этим доступом.")

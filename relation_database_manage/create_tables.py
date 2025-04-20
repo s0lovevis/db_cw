@@ -105,6 +105,24 @@ def initialize_database():
         FOREIGN KEY (item_id) REFERENCES catalog(item_id)
     );
 
+    -- Создание таблицы типов заданий
+    CREATE TABLE IF NOT EXISTS task_types (
+        type_id SERIAL PRIMARY KEY,
+        name_en VARCHAR(50) NOT NULL UNIQUE,
+        name_ru VARCHAR(100) NOT NULL,
+        description TEXT
+    );
+ 
+    CREATE TABLE IF NOT EXISTS tasks (
+        task_id SERIAL PRIMARY KEY,
+        type_id INT NOT NULL,
+        creator_username VARCHAR(50) NOT NULL,
+        assignee_username VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP WITH TIME ZONE,
+        FOREIGN KEY (type_id) REFERENCES task_types(type_id)
+    );
+
 
 
     """
@@ -153,6 +171,11 @@ def fill_initial_data():
     (1, 'Палета деревянная', 'Палета 120x80 стандарт', 120, 80, 15, 800),
     (2, 'Контейнер пластиковый', 'Герметичный пластиковый контейнер', 60, 40, 35, 1200),
     (3, 'Короб архивный', 'Картонная коробка для документов', 35, 25, 10, 300);
+
+    -- Добавление начального типа задания
+    INSERT INTO task_types (name_en, name_ru, description)
+    VALUES ('update_catalog', 'Актуализировать каталог', 'Проверка и обновление информации в каталоге товаров')
+    ON CONFLICT (name_en) DO NOTHING;
     """
 
     conn = None
