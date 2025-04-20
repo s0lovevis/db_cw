@@ -84,6 +84,26 @@ def initialize_database():
         FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
     );
 
+    -- Сущность транзакций (операций по складу)
+    CREATE TABLE IF NOT EXISTS transactions (
+        transaction_id SERIAL PRIMARY KEY,
+        item_id       INT       NOT NULL,
+        operation     VARCHAR(10) NOT NULL,      -- 'Добавить' или 'Удалить'
+        quantity      NUMERIC    NOT NULL,
+        transaction_time TIMESTAMP NOT NULL DEFAULT NOW(),
+        FOREIGN KEY (item_id) REFERENCES catalog(item_id)
+    );
+
+    -- Сущность текущего состояния склада
+    CREATE TABLE IF NOT EXISTS warehouse (
+        warehouse_id  SERIAL PRIMARY KEY,
+        item_id       INT       NOT NULL,
+        quantity      NUMERIC    NOT NULL,
+        last_updated  TIMESTAMP NOT NULL DEFAULT NOW(),
+        FOREIGN KEY (item_id) REFERENCES catalog(item_id)
+    );
+
+
 
     """
 
