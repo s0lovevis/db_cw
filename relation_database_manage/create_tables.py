@@ -86,11 +86,13 @@ def initialize_database():
 
     -- Сущность транзакций (операций по складу)
     CREATE TABLE IF NOT EXISTS transactions (
-        transaction_id SERIAL PRIMARY KEY,
-        item_id       INT       NOT NULL,
-        operation     VARCHAR(10) NOT NULL,      -- 'Добавить' или 'Удалить'
-        quantity      NUMERIC    NOT NULL,
-        transaction_time TIMESTAMP NOT NULL DEFAULT NOW(),
+        transaction_id   SERIAL    PRIMARY KEY,
+        item_id          INT       NOT NULL,
+        operation        VARCHAR(10) NOT NULL,      -- 'Добавить' или 'Удалить'
+        quantity         NUMERIC    NOT NULL,
+        monetary_volume  NUMERIC    NOT NULL,       -- денежный объём операции
+        success          BOOLEAN    NOT NULL,       -- флаг успешности
+        transaction_time TIMESTAMP  NOT NULL DEFAULT NOW(),
         FOREIGN KEY (item_id) REFERENCES catalog(item_id)
     );
 
