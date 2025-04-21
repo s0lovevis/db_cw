@@ -13,6 +13,7 @@ from core_services.manage_warehouse import render_manage_warehouse
 from core_services.manage_tasks import render_manage_tasks
 from core_services.view_warehouse import render_view_warehouse
 from core_services.view_suppliers import render_view_suppliers
+from core_services.transaction_report import render_transaction_report
 
 
 def logout():
@@ -96,6 +97,8 @@ def show_dynamic_page():
         render_view_warehouse()
     elif current == "view_suppliers":
         render_view_suppliers()
+    elif current == "transaction_report":
+        render_transaction_report()
     else:
         st.title(f"📄 Раздел: {current}")
         st.write("Здесь будет функциональность, связанная с этим доступом.")

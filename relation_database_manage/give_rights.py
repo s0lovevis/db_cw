@@ -38,6 +38,7 @@ def initialize_database():
         ((SELECT role_id FROM roles WHERE name = 'admin'), 'view_users', '👥Просмотр списка сотрудников'),
         ((SELECT role_id FROM roles WHERE name = 'admin'), 'view_suppliers', '💼Просмотр базы поставщиков'),
         ((SELECT role_id FROM roles WHERE name = 'admin'), 'view_warehouse', '🏭Просмотр содержимого склада'),
+        ((SELECT role_id FROM roles WHERE name = 'admin'), 'transaction_report', '📊Отчёт по транзакциям'),
         ((SELECT role_id FROM roles WHERE name = 'admin'), 'change_password', '🔐Смена пароля'),
 
         -- Для менеджера
