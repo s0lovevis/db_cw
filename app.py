@@ -95,7 +95,7 @@ def show_dynamic_page():
     elif current == "view_warehouse":
         render_view_warehouse()
     elif current == "view_suppliers":
-        render_view_warehouse()
+        render_view_suppliers()
     else:
         st.title(f"📄 Раздел: {current}")
         st.write("Здесь будет функциональность, связанная с этим доступом.")

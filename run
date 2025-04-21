@@ -12,6 +12,15 @@ if [ $? -eq 0 ]; then
     if [ $? -eq 0 ]; then
         # Запуск третьего скрипта
         python3 relation_database_manage/give_rights.py
+
+        # Проверка на успешное выполнение третьего скрипта
+        if [ $? -eq 0 ]; then
+            # Запуск очистки Redis
+            python3 key_value_database_manage/redis_clear.py
+        else
+            echo "Ошибка при выполнении give_rights.py"
+            exit 1
+        fi
     else
         echo "Ошибка при выполнении create_tables.py"
         exit 1
