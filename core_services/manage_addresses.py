@@ -1,9 +1,11 @@
 import streamlit as st
 import psycopg2
 from connect import get_connection
+from core_services.logger import log_action
 import pandas as pd
 
 def render_manage_addresses():
+    log_action("open_manage_addresses_page")
     st.title("🏠 Управление адресами поставщиков")
 
     # Функция добавления адреса
@@ -70,6 +72,7 @@ def render_manage_addresses():
     action = st.selectbox("Выберите действие", ["Посмотреть все адреса", "Добавить адрес", "Изменить адрес", "Удалить адрес"])
 
     if action == "Посмотреть все адреса":
+        log_action("view_addresses")
         view_addresses()
 
     elif action == "Добавить адрес":
@@ -78,6 +81,10 @@ def render_manage_addresses():
         house = st.text_input("Дом")
         building = st.text_input("Строение")
         if st.button("Добавить"):
+            log_action("add_address", {
+                "city": city, "street": street,
+                "house": house, "building": building
+            })
             add_address(city, street, house, building)
 
     elif action == "Изменить адрес":
