@@ -78,13 +78,26 @@ def render_manage_suppliers():
     def delete_supplier(supplier_id):
         with get_connection() as conn:
             with conn.cursor() as cur:
+                # Проверяем, что поставщик существует
                 cur.execute("SELECT 1 FROM suppliers WHERE supplier_id = %s", (supplier_id,))
                 if not cur.fetchone():
                     st.error("Поставщик с таким ID не найден.")
                     return
+
+                # Новая проверка: есть ли у него товары в каталоге?
+                cur.execute("SELECT 1 FROM catalog WHERE supplier_id = %s LIMIT 1", (supplier_id,))
+                if cur.fetchone():
+                    st.error(
+                        "Невозможно удалить поставщика: в каталоге есть товары этого поставщика. "
+                        "Сначала удалите (или перенесите) все товары данного поставщика из каталога, "
+                        "а затем повторите удаление."
+                    )
+                    return
+
+                # Если товаров нет — можно удалять
                 cur.execute("DELETE FROM suppliers WHERE supplier_id = %s", (supplier_id,))
                 conn.commit()
-                st.success("Поставщик удален.")
+                st.success("Поставщик удалён.")
 
     # Функция выгрузки всех поставщиков
     def view_suppliers():

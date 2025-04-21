@@ -41,10 +41,22 @@ def render_manage_catalog():
     def delete_item(item_id):
         with get_connection() as conn:
             with conn.cursor() as cur:
+                # Проверяем, что товар существует
                 cur.execute("SELECT 1 FROM catalog WHERE item_id = %s", (item_id,))
                 if not cur.fetchone():
                     st.error("Товар с таким ID не найден.")
                     return
+
+                # Новая проверка: есть ли транзакции по этому товару?
+                cur.execute("SELECT 1 FROM transactions WHERE item_id = %s LIMIT 1", (item_id,))
+                if cur.fetchone():
+                    st.error(
+                        "Невозможно удалить товар: по нему есть зафиксированные транзакции. "
+                        "Рекомендуем завести новый тип товара и работать с ним."
+                    )
+                    return
+
+                # Если транзакций нет — можно удалять
                 cur.execute("DELETE FROM catalog WHERE item_id = %s", (item_id,))
                 conn.commit()
                 st.success("Товар удалён.")
