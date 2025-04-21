@@ -1,6 +1,7 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
+from pymongo import MongoClient
 import redis
 
 load_dotenv()
@@ -22,7 +23,11 @@ def get_redis_connection() -> redis.Redis:
         password=os.getenv("REDIS_PASSWORD")
     )
 
-if __name__ == "__main__":
-    r = get_redis_connection()
-    r.set("foo", "bar")
-    print(r.get("foo").decode())
+def get_mongo_connection() -> MongoClient:
+    return MongoClient(
+        host=os.getenv("MONGO_HOST"),
+        port=int(os.getenv("MONGO_PORT")),
+        username=os.getenv("MONGO_USER"),
+        password=os.getenv("MONGO_PASSWORD"),
+        authSource=os.getenv("MONGO_AUTH_DB", "admin")
+    )
