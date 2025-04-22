@@ -5,7 +5,8 @@ __pycache__/
 
 # C extensions
 *.so
-
+export_code
+zip_files_script
 # Distribution / packaging
 srm_system_project.zip
 all_code.txt
